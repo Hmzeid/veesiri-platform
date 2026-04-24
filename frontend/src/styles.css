@@ -279,6 +279,24 @@ body.gov-dark h4, body.gov-dark h5, body.gov-dark h6 { color: #f8fafc; }
 body.gov-dark p { color: #cbd5e1; }
 body.gov-dark a { color: #C8A548; }
 
+/* Light-surface escape hatch — for printable pages that live inside
+   the gov-dark portal but render on white paper (Ministerial, Executive
+   reports). Overrides the sweeping h1/p colors above. */
+body.gov-dark .gov-light-surface,
+body.gov-dark .gov-light-surface .ant-typography,
+body.gov-dark .gov-light-surface h1,
+body.gov-dark .gov-light-surface h2,
+body.gov-dark .gov-light-surface h3,
+body.gov-dark .gov-light-surface h4,
+body.gov-dark .gov-light-surface h5,
+body.gov-dark .gov-light-surface h6 { color: #0b1220 !important; }
+body.gov-dark .gov-light-surface p,
+body.gov-dark .gov-light-surface .ant-typography.ant-typography-secondary {
+  color: #29344d !important;
+}
+body.gov-dark .gov-light-surface a { color: var(--color-primary) !important; }
+body.gov-dark .gov-light-surface .eyebrow { color: var(--color-primary) !important; }
+
 body.gov-dark .kpi-tile {
   background: #121a2d;
   border-color: rgba(255,255,255,0.08);

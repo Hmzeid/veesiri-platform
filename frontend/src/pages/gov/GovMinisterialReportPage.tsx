@@ -38,7 +38,7 @@ export default function GovMinisterialReportPage() {
   };
 
   return (
-    <div style={{ background: '#f8fafc', minHeight: '100vh', color: '#0b1220' }}>
+    <div className="gov-light-surface" style={{ background: '#f8fafc', minHeight: '100vh', color: '#0b1220' }}>
       <div
         className="no-print"
         style={{
