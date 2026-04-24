@@ -100,32 +100,53 @@ A unified digital compliance and transformation management system built around t
 ## Getting started
 
 ### Prerequisites
-- Node.js 20+
+- Node.js 18+
 - Docker + Docker Compose
 - npm 10+
 
-### Setup
+### One-line start
 
 ```bash
-# Install workspace dependencies
+./start.sh
+```
+
+That's it. The script will:
+
+1. Verify Node + Docker are present and the daemon is running
+2. Spin up Postgres + Redis via Docker Compose
+3. Wait for Postgres to be ready
+4. `npm install` if `node_modules` is missing
+5. Create `backend/.env` from the example (using a free local port)
+6. Generate the Prisma client and apply migrations
+7. Seed 15 demo factories + assessments + roadmaps + recommendations + certificates (only if the database is empty — pass `--reseed` to refresh)
+8. Compile the backend (skip with cached `dist/`, force with `--rebuild`)
+9. Launch the backend and frontend in the background, with logs in `.run/`
+
+When it finishes you'll see the URLs and demo credentials printed in your terminal.
+
+### Stop everything
+
+```bash
+./stop.sh           # stop backend + frontend
+./stop.sh --down    # also tear down Postgres + Redis containers
+```
+
+### Manual setup (if you don't want the script)
+
+```bash
 npm install
-
-# Start Postgres + Redis
-npm run db:up
-
-# Configure the backend
+docker compose up -d postgres redis
 cp backend/.env.example backend/.env
 
-# Generate Prisma client, run migrations, seed 15 demo factories
 cd backend
 npx prisma generate
-npx prisma migrate dev --name init
+npx prisma migrate deploy   # or `migrate dev --name init` first time
 npm run prisma:seed
+npx tsc -p tsconfig.json --outDir dist
+node dist/src/main.js &     # backend on 3101
 cd ..
 
-# Run backend (port 3001) and frontend (port 5173) in two terminals
-npm run dev:backend      # terminal 1
-npm run dev:frontend     # terminal 2
+cd frontend && npx vite     # frontend on 5173
 ```
 
 Open **http://localhost:5173**.

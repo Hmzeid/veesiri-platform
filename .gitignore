@@ -11,3 +11,4 @@ coverage/
 *.tsbuildinfo
 backend/dist/
 backend/.env
+.run/
