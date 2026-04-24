@@ -58,6 +58,43 @@ function GovProtected({ children }: { children: JSX.Element }) {
   return children;
 }
 
+// Wrap gov routes in a NESTED ConfigProvider using AntD's dark algorithm —
+// this means every AntD component (cards, tables, inputs, selects, tags, menus,
+// drawers, dropdowns) auto-themes correctly, with no CSS override wars.
+function GovThemeWrap({ children }: { children: JSX.Element }) {
+  const { i18n } = useTranslation();
+  const direction = i18n.language === 'ar' ? 'rtl' : 'ltr';
+  return (
+    <ConfigProvider
+      direction={direction}
+      theme={{
+        token: {
+          colorPrimary: '#C8A548',
+          colorInfo: '#C8A548',
+          colorBgBase: '#0b1220',
+          colorBgLayout: '#0b1220',
+          colorBgContainer: '#121a2d',
+          colorBgElevated: '#1a2440',
+          colorBorder: 'rgba(255,255,255,0.08)',
+          colorBorderSecondary: 'rgba(255,255,255,0.06)',
+          colorText: '#e2e8f0',
+          colorTextSecondary: '#94a3b8',
+          colorTextTertiary: '#64748b',
+          colorTextDescription: '#94a3b8',
+          borderRadius: 10,
+          fontFamily:
+            direction === 'rtl'
+              ? "'Tajawal', 'IBM Plex Sans Arabic', 'Noto Sans Arabic', Tahoma, sans-serif"
+              : "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+        },
+        algorithm: theme.darkAlgorithm,
+      }}
+    >
+      {children}
+    </ConfigProvider>
+  );
+}
+
 export default function App() {
   const { i18n } = useTranslation();
   const hydrate = useAuth((s) => s.hydrate);
@@ -76,6 +113,8 @@ export default function App() {
         token: {
           colorPrimary: '#006C35',
           colorInfo: '#1A2F4E',
+          colorText: '#0b1220',
+          colorTextSecondary: '#64748b',
           borderRadius: 10,
           fontFamily:
             direction === 'rtl'
@@ -96,13 +135,15 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* Government auth + portal */}
-        <Route path="/gov/login" element={<GovLoginPage />} />
+        {/* Gov portal (dark theme via nested ConfigProvider) */}
+        <Route path="/gov/login" element={<GovThemeWrap><GovLoginPage /></GovThemeWrap>} />
         <Route
           path="/gov"
           element={
             <GovProtected>
-              <GovShell />
+              <GovThemeWrap>
+                <GovShell />
+              </GovThemeWrap>
             </GovProtected>
           }
         >

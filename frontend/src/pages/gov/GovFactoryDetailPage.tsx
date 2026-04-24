@@ -95,13 +95,27 @@ export default function GovFactoryDetailPage() {
           <Row gutter={[8, 8]}>
             {latest.responses.map((r: any) => (
               <Col xs={12} md={6} key={r.dimensionCode}>
-                <div style={{ padding: 10, borderRadius: 6, background: '#f9fafb', border: '1px solid #e5e7eb' }}>
-                  <div style={{ fontSize: 11, color: '#6b7280' }}>{r.dimensionCode}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                    <div style={{ width: 28, height: 28, background: scoreColor(r.rawScore), color: '#fff', borderRadius: 4, display: 'grid', placeItems: 'center', fontWeight: 700 }}>
+                <div style={{
+                  padding: 12, borderRadius: 10,
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  color: '#e2e8f0',
+                }}>
+                  <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600, letterSpacing: '0.05em' }}>
+                    {r.dimensionCode}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 6 }}>
+                    <div style={{
+                      width: 32, height: 32,
+                      background: scoreColor(r.rawScore), color: '#fff',
+                      borderRadius: 6, display: 'grid', placeItems: 'center',
+                      fontWeight: 700, fontSize: 14,
+                    }}>
                       {r.rawScore}
                     </div>
-                    <div style={{ fontSize: 12 }}>{t(`buildingBlock.${r.buildingBlock}`)}</div>
+                    <div style={{ fontSize: 12, color: '#cbd5e1' }}>
+                      {t(`buildingBlock.${r.buildingBlock}`)}
+                    </div>
                   </div>
                 </div>
               </Col>

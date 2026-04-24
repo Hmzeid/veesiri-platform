@@ -268,57 +268,37 @@ a { color: var(--color-primary); }
   padding: 0 24px;
 }
 
-/* ===== Government dark mode ===== */
-body.gov-dark { background: #0b1220; }
-.gov-dark .ant-layout,
-.gov-dark .ant-layout-content { background: transparent !important; }
-.gov-dark .kpi-tile,
-.gov-dark .ant-card,
-.gov-dark .premium-card {
-  background: rgba(255,255,255,0.04) !important;
-  border-color: rgba(255,255,255,0.08) !important;
-  color: #e2e8f0 !important;
+/* ===== Government dark mode =====
+   AntD's darkAlgorithm (set via ConfigProvider wrapping gov routes) handles
+   ALL AntD component theming automatically. We only add overrides here for
+   non-AntD elements. */
+
+body.gov-dark { background: #0b1220; color: #e2e8f0; }
+body.gov-dark h1, body.gov-dark h2, body.gov-dark h3,
+body.gov-dark h4, body.gov-dark h5, body.gov-dark h6 { color: #f8fafc; }
+body.gov-dark p { color: #cbd5e1; }
+body.gov-dark a { color: #C8A548; }
+
+body.gov-dark .kpi-tile {
+  background: #121a2d;
+  border-color: rgba(255,255,255,0.08);
+  color: #e2e8f0;
 }
-.gov-dark .ant-card .ant-card-head {
-  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+body.gov-dark .kpi-value { color: #f8fafc; }
+body.gov-dark .kpi-label { color: #94a3b8; }
+body.gov-dark .premium-card {
+  background: #121a2d;
+  border-color: rgba(255,255,255,0.08);
+  color: #e2e8f0;
 }
-.gov-dark .ant-card .ant-card-head-title,
-.gov-dark h1, .gov-dark h2, .gov-dark h3, .gov-dark h4, .gov-dark h5, .gov-dark h6,
-.gov-dark .kpi-value,
-.gov-dark .ant-typography,
-.gov-dark .ant-typography h1, .gov-dark .ant-typography h2, .gov-dark .ant-typography h3,
-.gov-dark .ant-typography h4, .gov-dark .ant-typography h5 {
-  color: #f8fafc !important;
+body.gov-dark .feature-card {
+  background: #121a2d;
+  border-color: rgba(255,255,255,0.08);
+  color: #e2e8f0;
 }
-.gov-dark p,
-.gov-dark .kpi-label,
-.gov-dark .ant-typography.ant-typography-secondary,
-.gov-dark .ant-typography-caption {
-  color: #94a3b8 !important;
-}
-.gov-dark a { color: #C8A548; }
-.gov-dark .ant-table {
-  background: transparent !important;
-  color: #e2e8f0 !important;
-}
-.gov-dark .ant-table-thead > tr > th {
-  background: rgba(255,255,255,0.06) !important;
-  color: #f8fafc !important;
-  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
-}
-.gov-dark .ant-table-tbody > tr > td {
-  border-bottom: 1px solid rgba(255,255,255,0.05) !important;
-}
-.gov-dark .ant-table-tbody > tr:hover > td {
-  background: rgba(255,255,255,0.04) !important;
-}
-.gov-dark .ant-menu-dark {
-  background: transparent !important;
-}
-.gov-dark .ant-menu-dark .ant-menu-item { margin: 2px 10px; border-radius: 8px; }
-.gov-dark .ant-menu-dark .ant-menu-item-selected {
-  background: rgba(200,165,72,0.15) !important;
-  color: #C8A548 !important;
+body.gov-dark .chip {
+  background: rgba(255,255,255,0.06);
+  color: #cbd5e1;
 }
 
 /* ===== Animations / utility ===== */
