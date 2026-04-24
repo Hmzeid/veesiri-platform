@@ -1,0 +1,624 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum IndustryGroup {
+  AEROSPACE
+  AUTOMOTIVE
+  ELECTRONICS
+  ENERGY_CHEMICALS
+  FOOD_BEVERAGE
+  GENERAL_MANUFACTURING
+  LOGISTICS
+  OIL_GAS
+  MACHINERY_EQUIPMENT
+  MEDICAL_TECHNOLOGY
+  PHARMACEUTICALS
+  PRECISION_PARTS
+  SEMICONDUCTORS
+  TEXTILE_CLOTHING
+}
+
+enum SizeClassification {
+  MICRO
+  SMALL
+  MEDIUM
+  LARGE
+}
+
+enum SubscriptionTier {
+  BASIC
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+enum FactoryStatus {
+  ACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+}
+
+enum FactoryRole {
+  ADMIN
+  ASSESSOR
+  QUALITY_MANAGER
+  VIEWER
+}
+
+enum BuildingBlock {
+  PROCESS
+  TECHNOLOGY
+  ORGANIZATION
+}
+
+enum Pillar {
+  OPERATIONS
+  SUPPLY_CHAIN
+  PRODUCT_LIFECYCLE
+  AUTOMATION
+  CONNECTIVITY
+  INTELLIGENCE
+  TALENT_READINESS
+  STRUCTURE_MANAGEMENT
+}
+
+enum AssessmentType {
+  SELF
+  ASSESSOR_VERIFIED
+  RENEWAL
+}
+
+enum AssessmentStatus {
+  DRAFT
+  IN_PROGRESS
+  SUBMITTED
+  CERTIFIED
+  EXPIRED
+}
+
+enum GapSeverity {
+  CRITICAL
+  MODERATE
+  MINOR
+  ON_TRACK
+}
+
+enum RoadmapStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  ACTIVE
+  COMPLETED
+}
+
+enum PhaseStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+}
+
+enum InitiativeStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  DELAYED
+}
+
+enum MilestoneStatus {
+  PENDING
+  COMPLETED
+  OVERDUE
+}
+
+enum RecommendationType {
+  ACTION
+  TECHNOLOGY
+  VENDOR
+  INITIATIVE
+  LEARNING
+}
+
+enum NotificationType {
+  ASSESSMENT_EXPIRY
+  MILESTONE_DUE
+  DOCUMENT_EXPIRY
+  SIDF_UPDATE
+  COMPLIANCE_ALERT
+  SYSTEM
+  BROADCAST
+  RECOMMENDATION
+  CERTIFICATE_ISSUED
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  SMS
+  WHATSAPP
+}
+
+enum NotificationPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum DocumentType {
+  CERTIFICATION
+  EVIDENCE
+  REPORT
+  TEMPLATE
+  CONTRACT
+  OTHER
+}
+
+enum GovAlertType {
+  EXPIRED_ASSESSMENT
+  SCORE_DECLINE
+  SIDF_NON_COMPLIANCE
+  REGISTRATION_ANOMALY
+}
+
+enum GovAlertSeverity {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum GovOrganization {
+  MIMR
+  SIDF
+  SASO
+  REGIONAL_AUTHORITY
+  OTHER_MINISTRY
+}
+
+enum GovRole {
+  VIEWER
+  ANALYST
+  DIRECTOR
+  MINISTER
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  nameAr       String?
+  nameEn       String?
+  phone        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  factories      FactoryUser[]
+  responses      DimensionResponse[]
+  ownedFactories Factory[]           @relation("FactoryOwner")
+  notifications  Notification[]
+}
+
+model Factory {
+  id                  String             @id @default(uuid())
+  tenantId            String             @default(uuid())
+  crNumber            String             @unique
+  nameAr              String
+  nameEn              String
+  industryGroup       IndustryGroup
+  sizeClassification  SizeClassification
+  employeeCount       Int                @default(0)
+  annualRevenueSar    Decimal?           @db.Decimal(18, 2)
+  foundingYear        Int?
+  region              String?
+  city                String?
+  governorate         String?
+  gpsLat              Decimal?           @db.Decimal(10, 7)
+  gpsLng              Decimal?           @db.Decimal(10, 7)
+  addressAr           String?
+  addressEn           String?
+  website             String?
+  contactEmail        String?
+  contactPhone        String?
+  sidfEligible        Boolean            @default(false)
+  sidfFinanced        Boolean            @default(false)
+  sidfAmountSar       Decimal?           @db.Decimal(18, 2)
+  onboardingStep      Int                @default(1)
+  onboardingCompleted Boolean            @default(false)
+  subscriptionTier    SubscriptionTier   @default(BASIC)
+  status              FactoryStatus      @default(PENDING_VERIFICATION)
+  ownerId             String
+  owner               User               @relation("FactoryOwner", fields: [ownerId], references: [id])
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  users           FactoryUser[]
+  certifications  FactoryCertification[]
+  assessments     Assessment[]
+  gapAnalyses     GapAnalysis[]
+  roadmaps        Roadmap[]
+  recommendations Recommendation[]
+  documents       Document[]
+  folders         DocumentFolder[]
+  certificates    Certificate[]
+  notifications  Notification[]
+  govAlerts       GovAlert[]
+
+  @@index([tenantId])
+  @@index([industryGroup])
+  @@index([region])
+}
+
+model FactoryUser {
+  id         String      @id @default(uuid())
+  factoryId  String
+  userId     String
+  role       FactoryRole @default(VIEWER)
+  invitedAt  DateTime    @default(now())
+  acceptedAt DateTime?
+  factory    Factory     @relation(fields: [factoryId], references: [id], onDelete: Cascade)
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([factoryId, userId])
+  @@index([factoryId])
+  @@index([userId])
+}
+
+model FactoryCertification {
+  id                  String    @id @default(uuid())
+  factoryId           String
+  certificationType   String
+  certificationNumber String?
+  issuingBody         String?
+  issuedDate          DateTime?
+  expiryDate          DateTime?
+  documentUrl         String?
+  verified            Boolean   @default(false)
+  factory             Factory   @relation(fields: [factoryId], references: [id], onDelete: Cascade)
+  createdAt           DateTime  @default(now())
+
+  @@index([factoryId])
+}
+
+model QuestionBank {
+  id                 String         @id @default(uuid())
+  dimensionCode      String
+  dimensionNameAr    String
+  dimensionNameEn    String
+  buildingBlock      BuildingBlock
+  pillar             Pillar
+  industryGroup      IndustryGroup?
+  questionAr         String
+  questionEn         String
+  level0DescriptorAr String
+  level0DescriptorEn String
+  level1DescriptorAr String
+  level1DescriptorEn String
+  level2DescriptorAr String
+  level2DescriptorEn String
+  level3DescriptorAr String
+  level3DescriptorEn String
+  level4DescriptorAr String
+  level4DescriptorEn String
+  level5DescriptorAr String
+  level5DescriptorEn String
+  weight             Decimal        @default(1.0) @db.Decimal(5, 2)
+  isActive           Boolean        @default(true)
+
+  @@unique([dimensionCode, industryGroup])
+  @@index([industryGroup])
+}
+
+model Assessment {
+  id                String              @id @default(uuid())
+  factoryId         String
+  assessmentType    AssessmentType      @default(SELF)
+  status            AssessmentStatus    @default(DRAFT)
+  startedAt         DateTime            @default(now())
+  submittedAt       DateTime?
+  certifiedAt       DateTime?
+  expiresAt         DateTime?
+  version           Int                 @default(1)
+  overallScore      Decimal?            @db.Decimal(4, 2)
+  processScore      Decimal?            @db.Decimal(4, 2)
+  technologyScore   Decimal?            @db.Decimal(4, 2)
+  organizationScore Decimal?            @db.Decimal(4, 2)
+  industryGroup     IndustryGroup
+  factory           Factory             @relation(fields: [factoryId], references: [id], onDelete: Cascade)
+  responses         DimensionResponse[]
+  gapAnalyses       GapAnalysis[]
+  certificates      Certificate[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@index([factoryId])
+  @@index([status])
+}
+
+model DimensionResponse {
+  id            String        @id @default(uuid())
+  assessmentId  String
+  dimensionCode String
+  buildingBlock BuildingBlock
+  pillar        Pillar
+  rawScore      Int
+  weightedScore Decimal?      @db.Decimal(6, 3)
+  evidenceUrls  String[]      @default([])
+  notesAr       String?
+  notesEn       String?
+  respondedById String?
+  respondedAt   DateTime      @default(now())
+  assessment    Assessment    @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  respondedBy   User?         @relation(fields: [respondedById], references: [id])
+
+  @@unique([assessmentId, dimensionCode])
+  @@index([assessmentId])
+}
+
+model GapAnalysis {
+  id                    String         @id @default(uuid())
+  factoryId             String
+  assessmentId          String
+  overallGap            Decimal        @db.Decimal(4, 2)
+  processGap            Decimal        @db.Decimal(4, 2)
+  technologyGap         Decimal        @db.Decimal(4, 2)
+  organizationGap       Decimal        @db.Decimal(4, 2)
+  targetOverallScore    Decimal        @default(3.5) @db.Decimal(4, 2)
+  targetAchievementDate DateTime?
+  generatedAt           DateTime       @default(now())
+  factory               Factory        @relation(fields: [factoryId], references: [id], onDelete: Cascade)
+  assessment            Assessment     @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  dimensionGaps         DimensionGap[]
+  roadmaps              Roadmap[]
+  recommendations       Recommendation[]
+
+  @@index([factoryId])
+  @@index([assessmentId])
+}
+
+model DimensionGap {
+  id                    String      @id @default(uuid())
+  gapAnalysisId         String
+  dimensionCode         String
+  currentScore          Decimal     @db.Decimal(4, 2)
+  targetScore           Decimal     @db.Decimal(4, 2)
+  gapMagnitude          Decimal     @db.Decimal(4, 2)
+  priorityRank          Int
+  severity              GapSeverity
+  estimatedEffortMonths Int         @default(6)
+  estimatedCostSar      Decimal     @default(0) @db.Decimal(18, 2)
+  estimatedRoiSar       Decimal     @default(0) @db.Decimal(18, 2)
+  isQuickWin            Boolean     @default(false)
+  isSidfRelevant        Boolean     @default(false)
+  peerMedianScore       Decimal?    @db.Decimal(4, 2)
+  peerTop25Score        Decimal?    @db.Decimal(4, 2)
+  narrativeAr           String?
+  narrativeEn           String?
+  gapAnalysis           GapAnalysis @relation(fields: [gapAnalysisId], references: [id], onDelete: Cascade)
+
+  @@index([gapAnalysisId])
+}
+
+model Roadmap {
+  id              String          @id @default(uuid())
+  factoryId       String
+  gapAnalysisId   String
+  status          RoadmapStatus   @default(DRAFT)
+  titleAr         String
+  titleEn         String
+  startDate       DateTime
+  endDate         DateTime
+  totalBudgetSar  Decimal         @default(0) @db.Decimal(18, 2)
+  approvedById    String?
+  approvedAt      DateTime?
+  version         Int             @default(1)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  factory         Factory         @relation(fields: [factoryId], references: [id], onDelete: Cascade)
+  gapAnalysis     GapAnalysis     @relation(fields: [gapAnalysisId], references: [id], onDelete: Cascade)
+  phases          RoadmapPhase[]
+
+  @@index([factoryId])
+}
+
+model RoadmapPhase {
+  id                 String              @id @default(uuid())
+  roadmapId          String
+  phaseNumber        Int
+  nameAr             String
+  nameEn             String
+  startDate          DateTime
+  endDate            DateTime
+  targetOverallScore Decimal?            @db.Decimal(4, 2)
+  status             PhaseStatus         @default(PLANNED)
+  roadmap            Roadmap             @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  initiatives        RoadmapInitiative[]
+
+  @@index([roadmapId])
+}
+
+model RoadmapInitiative {
+  id                   String           @id @default(uuid())
+  phaseId              String
+  dimensionCode        String?
+  titleAr              String
+  titleEn              String
+  descriptionAr        String?
+  descriptionEn        String?
+  startDate            DateTime
+  endDate              DateTime
+  budgetSar            Decimal          @default(0) @db.Decimal(18, 2)
+  sidfEligible         Boolean          @default(false)
+  ownerUserId          String?
+  vendorName           String?
+  status               InitiativeStatus @default(PLANNED)
+  completionPercentage Int              @default(0)
+  phase                RoadmapPhase     @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  milestones           Milestone[]
+
+  @@index([phaseId])
+}
+
+model Milestone {
+  id           String            @id @default(uuid())
+  initiativeId String
+  titleAr      String
+  titleEn      String
+  dueDate      DateTime
+  completedAt  DateTime?
+  status       MilestoneStatus   @default(PENDING)
+  initiative   RoadmapInitiative @relation(fields: [initiativeId], references: [id], onDelete: Cascade)
+
+  @@index([initiativeId])
+}
+
+model Recommendation {
+  id                   String             @id @default(uuid())
+  factoryId            String
+  gapAnalysisId        String?
+  dimensionCode        String
+  recommendationType   RecommendationType
+  titleAr              String
+  titleEn              String
+  descriptionAr        String
+  descriptionEn        String
+  rationaleAr          String?
+  rationaleEn          String?
+  estimatedImpactScore Decimal            @default(0) @db.Decimal(4, 2)
+  estimatedCostSar     Decimal            @default(0) @db.Decimal(18, 2)
+  confidenceScore      Decimal            @default(0.85) @db.Decimal(4, 2)
+  userFeedback         String?
+  createdAt            DateTime           @default(now())
+  factory              Factory            @relation(fields: [factoryId], references: [id], onDelete: Cascade)
+  gapAnalysis          GapAnalysis?       @relation(fields: [gapAnalysisId], references: [id], onDelete: SetNull)
+
+  @@index([factoryId])
+  @@index([gapAnalysisId])
+}
+
+model DocumentFolder {
+  id             String           @id @default(uuid())
+  factoryId      String
+  parentFolderId String?
+  nameAr         String
+  nameEn         String
+  dimensionCode  String?
+  isSystemFolder Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+  factory        Factory          @relation(fields: [factoryId], references: [id], onDelete: Cascade)
+  parent         DocumentFolder?  @relation("FolderTree", fields: [parentFolderId], references: [id])
+  children       DocumentFolder[] @relation("FolderTree")
+  documents      Document[]
+
+  @@index([factoryId])
+  @@index([parentFolderId])
+}
+
+model Document {
+  id             String          @id @default(uuid())
+  factoryId      String
+  folderId       String?
+  nameAr         String?
+  nameEn         String
+  fileUrl        String
+  fileSizeBytes  Int             @default(0)
+  fileType       String
+  version        Int             @default(1)
+  dimensionTags  String[]        @default([])
+  documentType   DocumentType    @default(OTHER)
+  expiryDate     DateTime?
+  accessLevel    String          @default("all_team")
+  uploadedById   String?
+  uploadedAt     DateTime        @default(now())
+  isDeleted      Boolean         @default(false)
+  factory        Factory         @relation(fields: [factoryId], references: [id], onDelete: Cascade)
+  folder         DocumentFolder? @relation(fields: [folderId], references: [id])
+
+  @@index([factoryId])
+  @@index([folderId])
+}
+
+model Certificate {
+  id                 String     @id @default(uuid())
+  factoryId          String
+  assessmentId       String
+  verificationCode   String     @unique
+  siriLevelAchieved  Decimal    @db.Decimal(4, 2)
+  issuedDate         DateTime   @default(now())
+  expiryDate         DateTime
+  digitalSignature   String
+  isValid            Boolean    @default(true)
+  pdfUrl             String?
+  factory            Factory    @relation(fields: [factoryId], references: [id], onDelete: Cascade)
+  assessment         Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@index([factoryId])
+}
+
+model Notification {
+  id              String                 @id @default(uuid())
+  recipientUserId String
+  factoryId       String?
+  type            NotificationType
+  channel         NotificationChannel    @default(IN_APP)
+  priority        NotificationPriority   @default(MEDIUM)
+  titleAr         String
+  titleEn         String
+  bodyAr          String
+  bodyEn          String
+  actionUrl       String?
+  sentAt          DateTime               @default(now())
+  readAt          DateTime?
+  recipient       User                   @relation(fields: [recipientUserId], references: [id], onDelete: Cascade)
+  factory         Factory?               @relation(fields: [factoryId], references: [id], onDelete: Cascade)
+
+  @@index([recipientUserId])
+  @@index([readAt])
+}
+
+model GovernmentUser {
+  id           String          @id @default(uuid())
+  email        String          @unique
+  passwordHash String
+  nameAr       String
+  nameEn       String
+  organization GovOrganization
+  regionScope  String?
+  role         GovRole         @default(VIEWER)
+  lastLoginAt  DateTime?
+  createdAt    DateTime        @default(now())
+}
+
+model GovAlert {
+  id            String           @id @default(uuid())
+  factoryId     String
+  alertType     GovAlertType
+  severity      GovAlertSeverity
+  descriptionAr String
+  descriptionEn String
+  triggeredAt   DateTime         @default(now())
+  resolvedAt    DateTime?
+  factory       Factory          @relation(fields: [factoryId], references: [id], onDelete: Cascade)
+
+  @@index([factoryId])
+  @@index([severity])
+}
+
+model BenchmarkSnapshot {
+  id            String        @id @default(uuid())
+  snapshotDate  DateTime      @default(now())
+  industryGroup IndustryGroup
+  dimensionCode String
+  sampleSize    Int
+  meanScore     Decimal       @db.Decimal(4, 2)
+  medianScore   Decimal       @db.Decimal(4, 2)
+  p25Score      Decimal       @db.Decimal(4, 2)
+  p75Score      Decimal       @db.Decimal(4, 2)
+  p90Score      Decimal       @db.Decimal(4, 2)
+  region        String?
+
+  @@index([industryGroup, dimensionCode])
+}
