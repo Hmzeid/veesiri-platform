@@ -25,6 +25,8 @@ import {
   MenuOutlined,
   BankOutlined,
   UserOutlined,
+  SearchOutlined,
+  AuditOutlined,
 } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -34,6 +36,8 @@ import { useSelectedFactory } from '../store/selectedFactory';
 import { api } from '../api/client';
 import AiChatWidget from './AiChatWidget';
 import AnnouncementBar from './AnnouncementBar';
+import GlobalSearch from './GlobalSearch';
+import ProductTour from './ProductTour';
 
 const { Header, Sider, Content } = Layout;
 const { useBreakpoint } = Grid;
@@ -50,6 +54,20 @@ export default function AppShell() {
   const screens = useBreakpoint();
   const isMobile = !screens.lg;
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  // Global ⌘K / Ctrl+K to open search
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setSearchOpen((o) => !o);
+      }
+      if (e.key === 'Escape' && searchOpen) setSearchOpen(false);
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [searchOpen]);
 
   const { data: factories } = useQuery<any[]>({
     queryKey: ['factories'],
@@ -106,6 +124,7 @@ export default function AppShell() {
     { key: '/app/training', icon: <BookOutlined />, label: 'Training Hub' },
     { key: '/app/onboarding', icon: <PlusCircleOutlined />, label: t('nav.onboarding') },
     { key: '/app/notifications', icon: <BellOutlined />, label: t('notifications.title') },
+    { key: '/app/audit-log', icon: <AuditOutlined />, label: 'Audit Log' },
     { key: '/app/settings', icon: <SettingOutlined />, label: 'Settings' },
   ];
 
@@ -236,6 +255,24 @@ export default function AppShell() {
         <div style={{ flex: 1 }} />
 
         <Space size={isMobile ? 4 : 8}>
+          {!isMobile ? (
+            <Button
+              icon={<SearchOutlined />}
+              onClick={() => setSearchOpen(true)}
+              style={{
+                background: '#f1f5f9', border: 'none', color: '#64748b',
+                fontWeight: 500, minWidth: 200, textAlign: 'start',
+                display: 'flex', alignItems: 'center', gap: 8,
+              }}
+            >
+              <span style={{ flex: 1, textAlign: 'start' }}>Search…</span>
+              <kbd style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 4, padding: '1px 6px', fontFamily: "'JetBrains Mono', monospace", fontSize: 10 }}>
+                ⌘K
+              </kbd>
+            </Button>
+          ) : (
+            <Button icon={<SearchOutlined />} type="text" onClick={() => setSearchOpen(true)} size="small" />
+          )}
           <Dropdown
             menu={{ items: [] }}
             dropdownRender={() => <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, boxShadow: 'var(--shadow-md)' }}>{notifDropdown}</div>}
@@ -307,6 +344,8 @@ export default function AppShell() {
       </Drawer>
 
       <AiChatWidget />
+      <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <ProductTour />
     </Layout>
   );
 }

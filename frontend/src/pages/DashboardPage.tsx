@@ -16,6 +16,8 @@ import { api } from '../api/client';
 import { useAuth } from '../store/auth';
 import { useSelectedFactory } from '../store/selectedFactory';
 import Achievements from '../components/Achievements';
+import ForecastCard from '../components/ForecastCard';
+import SustainabilityCard from '../components/SustainabilityCard';
 
 export default function DashboardPage() {
   const { t, i18n } = useTranslation();
@@ -218,6 +220,18 @@ export default function DashboardPage() {
           </Card>
         </Col>
       </Row>
+
+      {/* Forecast + Sustainability */}
+      {fid && scored && (
+        <Row gutter={16}>
+          <Col xs={24} lg={14}>
+            <ForecastCard factoryId={fid} />
+          </Col>
+          <Col xs={24} lg={10}>
+            <SustainabilityCard factoryId={fid} />
+          </Col>
+        </Row>
+      )}
 
       {/* Achievements */}
       <Card>

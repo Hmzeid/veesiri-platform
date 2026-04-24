@@ -32,6 +32,9 @@ import CalendarPage from './pages/CalendarPage';
 import KanbanPage from './pages/KanbanPage';
 import SettingsPage from './pages/SettingsPage';
 import ApiDocsPage from './pages/ApiDocsPage';
+import AuditLogPage from './pages/AuditLogPage';
+import SuccessStoriesPage from './pages/SuccessStoriesPage';
+import StoryDetailPage from './pages/StoryDetailPage';
 import GovLoginPage from './pages/gov/GovLoginPage';
 import GovDashboardPage from './pages/gov/GovDashboardPage';
 import GovFactoryDetailPage from './pages/gov/GovFactoryDetailPage';
@@ -129,6 +132,8 @@ export default function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/siri" element={<SiriFrameworkPage />} />
         <Route path="/api-docs" element={<ApiDocsPage />} />
+        <Route path="/stories" element={<SuccessStoriesPage />} />
+        <Route path="/stories/:factoryId" element={<StoryDetailPage />} />
         <Route path="/verify/:code" element={<VerifyCertificatePage />} />
 
         {/* Factory auth */}
@@ -187,6 +192,7 @@ export default function App() {
           <Route path="vendors" element={<VendorMarketplacePage />} />
           <Route path="integrations" element={<IntegrationsPage />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="audit-log" element={<AuditLogPage />} />
         </Route>
 
         {/* Standalone printable report */}

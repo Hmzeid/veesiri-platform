@@ -75,6 +75,7 @@ export default function LandingPage() {
               <Link to="/siri" style={{ color: '#1a2f4e' }}>SIRI Framework</Link>
               <a href="#features" style={{ color: '#1a2f4e' }}>Features</a>
               <a href="#government" style={{ color: '#1a2f4e' }}>Government</a>
+              <Link to="/stories" style={{ color: '#1a2f4e' }}>Stories</Link>
               <a href="#pricing" style={{ color: '#1a2f4e' }}>Pricing</a>
               <Link to="/api-docs" style={{ color: '#1a2f4e' }}>API</Link>
               <Button
@@ -550,6 +551,7 @@ export default function LandingPage() {
           <Space size="large" style={{ flexWrap: 'wrap' }}>
             <Link to="/siri" style={{ color: '#94a3b8' }}>SIRI Framework</Link>
             <a href="#features" style={{ color: '#94a3b8' }}>Features</a>
+            <Link to="/stories" style={{ color: '#94a3b8' }}>Success stories</Link>
             <a href="#pricing" style={{ color: '#94a3b8' }}>Pricing</a>
             <Link to="/api-docs" style={{ color: '#94a3b8' }}>API</Link>
             <Link to="/gov/login" style={{ color: '#94a3b8' }}>Government portal</Link>

@@ -15,6 +15,7 @@ import { GovModule } from './gov/gov.module';
 import { BenchmarksModule } from './benchmarks/benchmarks.module';
 import { PublicModule } from './public/public.module';
 import { AiModule } from './ai/ai.module';
+import { AuditModule } from './audit/audit.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { AiModule } from './ai/ai.module';
     BenchmarksModule,
     PublicModule,
     AiModule,
+    AuditModule,
   ],
 })
 export class AppModule {}
